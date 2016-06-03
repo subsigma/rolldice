@@ -9,7 +9,7 @@ namespace RollDice
     public class TokenParser
     {
         public char[] Operands = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
-        public char[] Operators = { '^', '+', '-', '*', '/', '(', ')', 'd', 'e', 'f', 'g', 'x', 'r', ',', 'z' };
+        public char[] Operators = { '^', '+', '-', '*', '/', '(', ')', 'd', 'e', 'f', 'g', 'x', 'r', ',', 'z', 'p' };
 
         string Input;
         int Position = 0;

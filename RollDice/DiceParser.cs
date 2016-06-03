@@ -13,6 +13,7 @@ namespace RollDice
         public List<int> drops;
         public int rerolls;
         public int total;
+        public int plus;
         public double? grandTotal;
     }
 
@@ -104,41 +105,122 @@ namespace RollDice
 
         public DiceParser()
         {
-            Token powToken = new Token { TokenString = "^", Associativity = AssociativityTypes.Right, Precedence = 4,
-                RequiredValues = 2, IsFunction = false };
+            Token powToken = new Token
+            {
+                TokenString = "^",
+                Associativity = AssociativityTypes.Right,
+                Precedence = 4,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(powToken);
-            Token plusToken = new Token { TokenString = "+", Associativity = AssociativityTypes.Left, Precedence = 2,
-                RequiredValues = 2, IsFunction = false };
+            Token plusToken = new Token
+            {
+                TokenString = "+",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 2,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(plusToken);
-            Token subToken = new Token { TokenString = "-", Associativity = AssociativityTypes.Left, Precedence = 2,
-                RequiredValues = 2, IsFunction = false };
+            Token subToken = new Token
+            {
+                TokenString = "-",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 2,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(subToken);
-            Token multToken = new Token { TokenString = "*", Associativity = AssociativityTypes.Left, Precedence = 3,
-                RequiredValues = 2, IsFunction = false };
+            Token multToken = new Token
+            {
+                TokenString = "*",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 3,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(multToken);
-            Token divToken = new Token { TokenString = "/", Associativity = AssociativityTypes.Left, Precedence = 3,
-                RequiredValues = 2, IsFunction = false };
+            Token divToken = new Token
+            {
+                TokenString = "/",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 3,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(divToken);
-            Token rollDToken = new Token { TokenString = "d", Associativity = AssociativityTypes.Left, Precedence = 5,
-                RequiredValues = 2, IsFunction = false };
+            Token rollDToken = new Token
+            {
+                TokenString = "d",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 5,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(rollDToken);
-            Token rollEToken = new Token { TokenString = "e", Associativity = AssociativityTypes.Left, Precedence = 5,
-                RequiredValues = 2, IsFunction = false };
+            Token rollEToken = new Token
+            {
+                TokenString = "e",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 5,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(rollEToken);
-            Token rollFToken = new Token { TokenString = "f", Associativity = AssociativityTypes.Left, Precedence = 5,
-                RequiredValues = 2, IsFunction = false };
+            Token rollFToken = new Token
+            {
+                TokenString = "f",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 5,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(rollFToken);
-            Token rollGToken = new Token { TokenString = "g", Associativity = AssociativityTypes.Left, Precedence = 5,
-                RequiredValues = 2, IsFunction = false };
+            Token rollGToken = new Token
+            {
+                TokenString = "g",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 5,
+                RequiredValues = 2,
+                IsFunction = false
+            };
             TokenList.Add(rollGToken);
-            Token rollXToken = new Token { TokenString = "x", Associativity = AssociativityTypes.Left, Precedence = 6,
-                RequiredValues = 1, IsFunction = false };
+            Token rollXToken = new Token
+            {
+                TokenString = "x",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 6,
+                RequiredValues = 1,
+                IsFunction = false
+            };
             TokenList.Add(rollXToken);
-            Token rollRToken = new Token { TokenString = "r", Associativity = AssociativityTypes.Left, Precedence = 6,
-                RequiredValues = 1, IsFunction = false };
+            Token rollRToken = new Token
+            {
+                TokenString = "r",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 6,
+                RequiredValues = 1,
+                IsFunction = false
+            };
             TokenList.Add(rollRToken);
-            Token funCeiling = new Token { TokenString = "zCeiling", Associativity = AssociativityTypes.None, Precedence = 0,
-                RequiredValues = 1, IsFunction = true };
+            Token rollPToken = new Token
+            {
+                TokenString = "p",
+                Associativity = AssociativityTypes.Left,
+                Precedence = 6,
+                RequiredValues = 1,
+                IsFunction = false
+            };
+            TokenList.Add(rollPToken);
+            Token funCeiling = new Token
+            {
+                TokenString = "zCeiling",
+                Associativity = AssociativityTypes.None,
+                Precedence = 0,
+                RequiredValues = 1,
+                IsFunction = true
+            };
             TokenList.Add(funCeiling);
         }
 
@@ -197,7 +279,16 @@ namespace RollDice
 
                         foreach (int i in t.Roll.Value.results)
                         {
-                            detailedResults += i + " ";
+                            int iTotal = i + t.Roll.Value.plus;
+
+                            if (t.Roll.Value.plus > 0)
+                            {
+                                detailedResults += iTotal + "[" + i + "+" + t.Roll.Value.plus + "] ";
+                            }
+                            else
+                            {
+                                detailedResults += i + " ";
+                            }
                         }
 
                         foreach (int i in t.Roll.Value.drops)
@@ -240,7 +331,16 @@ namespace RollDice
 
                         foreach (int i in t.Roll.Value.results)
                         {
-                            detailedResults += i + " ";
+                            int iTotal = i + t.Roll.Value.plus;
+
+                            if(t.Roll.Value.plus > 0)
+                            {
+                                detailedResults += iTotal + "[" + i + "+" + t.Roll.Value.plus + "] ";
+                            }
+                            else
+                            {
+                                detailedResults += i + " ";
+                            }
                         }
 
                         foreach (int i in t.Roll.Value.drops)
@@ -276,6 +376,7 @@ namespace RollDice
 
             int x = 0;
             int r = 0;
+            int p = 0;
 
             TraceItem tStart = new TraceItem();
             tStart.Item = "Postfix";
@@ -310,11 +411,6 @@ namespace RollDice
                     else
                     {
                         t.Item = "";
-
-                        foreach(string s in RPN)
-                        {
-                            t.Item += s + " ";
-                        }
 
                         Stack<string> rStack = new Stack<string>();
 
@@ -356,7 +452,7 @@ namespace RollDice
                                 int rep = r;
                                 do
                                 {
-                                    t.Roll = (SimpleRoll(num, type, nextToken[0], x));
+                                    t.Roll = (SimpleRoll(num, type, nextToken[0], x, p));
                                     TheStack.Push((t.Roll.Value.total).ToString());
 
                                     if (rep != r)
@@ -368,12 +464,16 @@ namespace RollDice
                                 } while (rep >= 0);
                                 x = 0;
                                 r = 0;
+                                p = 0;
                                 break;
                             case "x":
                                 x = (int)Math.Ceiling(double.Parse(rStack.Pop()));
                                 break;
                             case "r":
                                 r = (int)Math.Ceiling(double.Parse(rStack.Pop()));
+                                break;
+                            case "p":
+                                p = (int)Math.Ceiling(double.Parse(rStack.Pop()));
                                 break;
                             case "zCeiling":
                                 TheStack.Push((Math.Ceiling(double.Parse(rStack.Pop()))).ToString());
@@ -493,7 +593,7 @@ namespace RollDice
             return Output;
         }
 
-        private RollResult SimpleRoll(int numDice, int typeDice, char rollType, int drop)
+        private RollResult SimpleRoll(int numDice, int typeDice, char rollType, int drop, int plus)
         {
             RollResult results = new RollResult();
             results.results = new List<int>();
@@ -507,6 +607,7 @@ namespace RollDice
 
             results.rerolls = 0;
             results.total = 0;
+            results.plus = plus;
 
             if((numDice > 0) && (typeDice > 1) && (numDice < 1001) && (drop <= numDice))
             {
@@ -553,7 +654,7 @@ namespace RollDice
 
                     foreach(int roll in results.results)
                     {
-                        results.total += roll;
+                        results.total += roll + plus;
                     }
 
                     return (results);
