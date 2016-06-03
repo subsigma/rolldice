@@ -190,7 +190,7 @@ namespace RollDice
             {
                 TokenString = "x",
                 Associativity = AssociativityTypes.Left,
-                Precedence = 6,
+                Precedence = 7,
                 RequiredValues = 1,
                 IsFunction = false
             };
@@ -208,7 +208,7 @@ namespace RollDice
             {
                 TokenString = "p",
                 Associativity = AssociativityTypes.Left,
-                Precedence = 6,
+                Precedence = 7,
                 RequiredValues = 1,
                 IsFunction = false
             };
@@ -371,11 +371,10 @@ namespace RollDice
         public List<TraceItem> GetResults(string inputString)
         {
             List<TraceItem> results = new List<TraceItem>();
-            Queue<string> RPN = GetRPN(inputString);
+            LinkedList<string> RPN = GetRPN(inputString);
             Stack<string> TheStack = new Stack<string>();
 
             int x = 0;
-            int r = 0;
             int p = 0;
 
             TraceItem tStart = new TraceItem();
@@ -394,7 +393,8 @@ namespace RollDice
             {
                 TraceItem t = new TraceItem();
 
-                string nextToken = RPN.Dequeue();
+                string nextToken = RPN.First();
+                RPN.RemoveFirst();
 
                 double tryInt;
 
@@ -449,28 +449,45 @@ namespace RollDice
                             case "g":
                                 int num = (int)Math.Ceiling(double.Parse(rStack.Pop()));
                                 int type = (int)Math.Ceiling(double.Parse(rStack.Pop()));
-                                int rep = r;
-                                do
-                                {
-                                    t.Roll = (SimpleRoll(num, type, nextToken[0], x, p));
-                                    TheStack.Push((t.Roll.Value.total).ToString());
-
-                                    if (rep != r)
-                                    {
-                                        TheStack.Push((double.Parse(TheStack.Pop()) + double.Parse(TheStack.Pop())).ToString());
-                                    }
-
-                                    rep--;
-                                } while (rep >= 0);
+                                t.Roll = (SimpleRoll(num, type, nextToken[0], x, p));
+                                TheStack.Push((t.Roll.Value.total).ToString());
                                 x = 0;
-                                r = 0;
                                 p = 0;
                                 break;
                             case "x":
                                 x = (int)Math.Ceiling(double.Parse(rStack.Pop()));
                                 break;
                             case "r":
-                                r = (int)Math.Ceiling(double.Parse(rStack.Pop()));
+                                int r = (int)Math.Ceiling(double.Parse(rStack.Pop()));
+
+                                string rollX = TheStack.Pop();
+                                string rollY = TheStack.Pop();
+                                string rollZ = RPN.First();
+                                RPN.RemoveFirst();
+
+                                int i;
+
+                                for(i = 0; i < r; i++)
+                                {
+                                    RPN.AddFirst("+");
+                                }
+
+                                for (i = 0; i <= r; i++)
+                                {
+                                    if(x > 0)
+                                    {
+                                        RPN.AddFirst("x");
+                                        RPN.AddFirst(x.ToString());
+                                    }
+                                    if(p > 0)
+                                    {
+                                        RPN.AddFirst("p");
+                                        RPN.AddFirst(p.ToString());
+                                    }
+                                    RPN.AddFirst(rollZ);
+                                    RPN.AddFirst(rollX);
+                                    RPN.AddFirst(rollY);
+                                }
                                 break;
                             case "p":
                                 p = (int)Math.Ceiling(double.Parse(rStack.Pop()));
@@ -504,10 +521,10 @@ namespace RollDice
             return (results);
         }
 
-        private Queue<string> GetRPN(string inputString)
+        private LinkedList<string> GetRPN(string inputString)
         {
             TokenParser tokens = new TokenParser(inputString);
-            Queue<string> Output = new Queue<string>();
+            LinkedList<string> Output = new LinkedList<string>();
             Stack<string> OperatorStack = new Stack<string>();
 
             for (string token = tokens.GetNextToken(); token != null; token = tokens.GetNextToken())
@@ -518,7 +535,7 @@ namespace RollDice
                 {
                     if (double.TryParse(token, out throwaway))
                     {
-                        Output.Enqueue(token);
+                        Output.AddLast(token);
                     }
                     else if (IsFunction(token))
                     {
@@ -532,7 +549,7 @@ namespace RollDice
                             {
                                 throw new FormatException();
                             }
-                            Output.Enqueue(OperatorStack.Pop());
+                            Output.AddLast(OperatorStack.Pop());
                         }
                     }
                     else if (IsOpToken(token))
@@ -546,7 +563,7 @@ namespace RollDice
                                 || ((GetTokenFromString(token).Associativity == AssociativityTypes.Right)
                                 && (GetPrecedence(token) < GetPrecedence(OperatorStack.Peek())))))
                             {
-                                Output.Enqueue(OperatorStack.Pop());
+                                Output.AddLast(OperatorStack.Pop());
                             }
                         }
                         OperatorStack.Push(token);
@@ -563,7 +580,7 @@ namespace RollDice
                             {
                                 throw new FormatException();
                             }
-                            Output.Enqueue(OperatorStack.Pop());
+                            Output.AddLast(OperatorStack.Pop());
                         }
 
                         OperatorStack.Pop();
@@ -572,7 +589,7 @@ namespace RollDice
                         {
                             if (IsFunction(OperatorStack.Peek()))
                             {
-                                Output.Enqueue(OperatorStack.Pop());
+                                Output.AddLast(OperatorStack.Pop());
                             }
                         }
                     }
@@ -586,7 +603,7 @@ namespace RollDice
                 }
                 else
                 {
-                    Output.Enqueue(OperatorStack.Pop());
+                    Output.AddLast(OperatorStack.Pop());
                 }
             }
 
