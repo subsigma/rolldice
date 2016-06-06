@@ -327,7 +327,7 @@ namespace RollDice
                 {
                     if (t.Roll.Value.grandTotal == null)
                     {
-                        detailedResults += "Rolling " + t.Roll.Value.description + "..." + System.Environment.NewLine;
+                        detailedResults += "Roll " + t.Roll.Value.description + ": ";
 
                         foreach (int i in t.Roll.Value.results)
                         {
@@ -348,12 +348,11 @@ namespace RollDice
                             detailedResults += "(" + i + ") ";
                         }
 
-                        detailedResults += System.Environment.NewLine + "Total: " + t.Roll.Value.total
-                            + System.Environment.NewLine;
+                        detailedResults += " | Total: " + t.Roll.Value.total;
 
                         if (t.Roll.Value.rerolls > 0)
                         {
-                            detailedResults += "Total rerolls: " + t.Roll.Value.rerolls + System.Environment.NewLine;
+                            detailedResults += " | Total rerolls: " + t.Roll.Value.rerolls;
                         }
 
                         detailedResults += System.Environment.NewLine;
